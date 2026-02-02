@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
         }  
     }
 
-    if(opt.path_count==0) {  // setting the default path if path not given
+    if(opt.path_count==0) { 
         opt.path = ".";
     }
 
