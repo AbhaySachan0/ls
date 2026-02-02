@@ -5,8 +5,8 @@ typedef struct Options {
     int show_all; // -a
     int show_inode; // -i
     int long_list; // -l
-    int path_count;
-    char path[100]; // stores path
+    int path_count; // check if there is path or not
+    char *path; // stores path
 } options;
 
 int main(int argc, char *argv[]) {
@@ -27,13 +27,20 @@ int main(int argc, char *argv[]) {
                         opt.show_inode= 1;
                         break;
                 }
+                
             }
-        }
-        /* else { // path
+        } else { // path
+            opt.path_count++;
+            opt.path = argv[i];
+        }  
+    }
 
-        } */ 
+    if(opt.path_count==0) {  // setting the default path if path not given
+        opt.path = ".";
     }
 
     printf("-a: %d\n-l: %d\n -i: %d\n",opt.show_all,opt.long_list,opt.show_inode);
+
+    printf("Path : %s\n",opt.path);
     
 }
