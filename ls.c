@@ -34,23 +34,26 @@ int main(int argc, char *argv[]) {
         opt.path = ".";
     }
 
-    printf("-a: %d\n-l: %d\n -i: %d\n",opt.show_all,opt.show_long_list,opt.show_inode);
+    // printf("-a: %d\n-l: %d\n -i: %d\n",opt.show_all,opt.show_long_list,opt.show_inode);
 
-    printf("Path : %s\n",opt.path);
+    // printf("Path : %s\n",opt.path);
 
-    unsigned long inode[100];
-    char *file_name[100];
+    // opening and reading the directory 
+
+    Data data = {0};
     
     DIR *dir = opendir(opt.path);
     struct dirent *entry;
     int i=0;
-    int count = 0;
+    int count = 0; // stores the number of directories/data/entry
     while((entry = readdir(dir)) !=NULL) {
-        inode[i] = entry->d_ino;
-        file_name[i] = strdup(entry->d_name);
+        data.inode[i] = entry->d_ino;
+        data.file_name[i] = strdup(entry->d_name);
         i++;
-        count++;
+        data.entry_count++;
     }
-    show_inode(inode,count);
+
+    sort_by_filename(&data);
+    show_inode(data, &opt);
 
 }
