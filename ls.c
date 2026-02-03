@@ -1,13 +1,8 @@
 #include<stdio.h>
 #include<dirent.h>
+#include"ls.h"
+#include<string.h>
 
-typedef struct Options {
-    int show_all; // -a
-    int show_inode; // -i
-    int long_list; // -l
-    int path_count; // check if there is path or not
-    char *path; // stores path
-} options;
 
 int main(int argc, char *argv[]) {
     options opt = {0};
@@ -21,7 +16,7 @@ int main(int argc, char *argv[]) {
                         opt.show_all = 1;
                         break;
                     case 'l':
-                        opt.long_list= 1;
+                        opt.show_long_list= 1;
                         break;
                     case 'i':
                         opt.show_inode= 1;
@@ -35,12 +30,27 @@ int main(int argc, char *argv[]) {
         }  
     }
 
-    if(opt.path_count==0) { 
+    if(opt.path_count==0) {
         opt.path = ".";
     }
 
-    printf("-a: %d\n-l: %d\n -i: %d\n",opt.show_all,opt.long_list,opt.show_inode);
+    printf("-a: %d\n-l: %d\n -i: %d\n",opt.show_all,opt.show_long_list,opt.show_inode);
 
     printf("Path : %s\n",opt.path);
+
+    unsigned long inode[100];
+    char *file_name[100];
     
+    DIR *dir = opendir(opt.path);
+    struct dirent *entry;
+    int i=0;
+    int count = 0;
+    while((entry = readdir(dir)) !=NULL) {
+        inode[i] = entry->d_ino;
+        file_name[i] = strdup(entry->d_name);
+        i++;
+        count++;
+    }
+    show_inode(inode,count);
+
 }
