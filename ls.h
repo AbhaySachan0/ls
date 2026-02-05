@@ -5,10 +5,10 @@
 #include<dirent.h>
 #include<sys/types.h>
 #include<sys/stat.h> // for stat()
+#include<unistd.h>
 
 #include <time.h>
 
-#include<unistd.h>
 #include<pwd.h>
 #include<grp.h>
 #define MAX_ENTRY 100
@@ -178,8 +178,6 @@ void show_inode(const Data data, options opt) {
     for(int i=0;i<data.entry_count;i++){
         char *name = data.file_name[i];
         
-        // if(!(opt.show_all) && name[0]=='.') continue;
-        // printf("%lu  %s\n",data.inode[i],data.file_name[i]);
 
         if(!(opt.show_all) && name[0]=='.') continue;
         if(opt.show_long_list){
