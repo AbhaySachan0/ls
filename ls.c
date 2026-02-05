@@ -59,22 +59,17 @@ int main(int argc, char *argv[]) {
 
     int i=0;
     while((entry = readdir(dir)) !=NULL) {
-        data.file_name[i] = strdup(entry->d_name);
-        i++;
-        data.entry_count++;
-    }
-
-    // sort_by_filename(&data);
-    // show_inode(data, &opt);
-
-
-    i=0;
-    while(i<data.entry_count) {
         struct stat st;
-        stat(data.file_name[i],&st);
+        // stat(entry->d_name,&st);
+        if (stat(entry->d_name, &st) == -1) {
+            perror("stat");
+            continue;
+        }
 
         struct passwd *pw = getpwuid(st.st_uid);
         struct group  *gr = getgrgid(st.st_gid);
+        
+        data.file_name[i] = strdup(entry->d_name);
 
         data.group[i] = strdup(gr->gr_name); 
         data.user[i] = strdup(pw->pw_name); 
@@ -86,14 +81,16 @@ int main(int argc, char *argv[]) {
         permission(st.st_mode,perm);
         data.permission[i] = strdup(perm);
 
-        
-        
         // printing
-        printf("%s\n",data.permission[i]);
+        // printf("%s\n",data.permission[i]);
         // printf("Modified: %s", ctime(&st.st_mtime));
         // printf("%d\n",data.userID[i]);
         // printf("%s\n",data.group[i]);
+        
         i++;
+        data.entry_count++;
     }
+
+    // sort_by_filename(&data);
 }
 
