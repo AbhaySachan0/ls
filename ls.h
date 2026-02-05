@@ -1,5 +1,9 @@
 
 #include<dirent.h>
+#include<stdio.h>
+
+#include<sys/types.h>
+#include<sys/stat.h> // for stat()
 
 #include<string.h>
 #define MAX_ENTRY 100
@@ -17,6 +21,10 @@ typedef struct {
     char *file_name[MAX_ENTRY];
     char *permission[MAX_ENTRY];
     char *user[MAX_ENTRY];
+    char *group[MAX_ENTRY];
+    unsigned int userID[MAX_ENTRY]; 
+
+    char *mod_time[MAX_ENTRY];
     int entry_count;
 }Data;
 
@@ -39,6 +47,35 @@ void sort_by_filename(Data *data) {
         }
     }
 }
+
+void permission(mode_t mode, char *perm) {
+
+    if(S_ISDIR(mode)) {
+        perm[0] = 'd';
+    } else {
+        perm[0] = '-';
+    }
+
+    // if((mode & S_IRUSR)) {
+    //     perm[1] = 'r';
+    // } else {
+    //     perm[1] = '-';
+    // }
+
+    perm[1] = (mode & S_IRUSR)?'r':'-';
+    perm[2] = (mode & S_IWUSR)?'w':'-';
+    perm[3] = (mode & S_IXUSR)?'x':'-';
+ 
+    perm[4] = (mode & S_IRUSR)?'r':'-';
+    perm[5] = (mode & S_IWUSR)?'w':'-';
+    perm[6] = (mode & S_IXGRP)?'x':'-';
+ 
+    perm[7] = (mode & S_IROTH)?'r':'-';
+    perm[8] = (mode & S_IWOTH)?'w':'-';
+    perm[9] = (mode & S_IXOTH)?'x':'-';
+    perm[10] = '\0';
+}
+
 
 
 void show_inode(const Data data, options *opt) {
