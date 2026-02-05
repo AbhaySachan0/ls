@@ -2,7 +2,17 @@
 #include<dirent.h>
 #include"ls.h"
 #include<string.h>
+#include<stdlib.h>
 
+// for user and group name
+#include<pwd.h>
+#include<grp.h>
+
+#include <time.h>
+
+
+#include<unistd.h>
+#include<sys/stat.h> // for stat()
 
 int main(int argc, char *argv[]) {
     options opt = {0};
@@ -32,10 +42,12 @@ int main(int argc, char *argv[]) {
 
     if(opt.path_count==0) {
         opt.path = ".";
+        
     }
 
-    // printf("-a: %d\n-l: %d\n -i: %d\n",opt.show_all,opt.show_long_list,opt.show_inode);
+    printf("Hello\n");
 
+    // printf("-a: %d\n-l: %d\n -i: %d\n",opt.show_all,opt.show_long_list,opt.show_inode);
     // printf("Path : %s\n",opt.path);
 
     // opening and reading the directory 
@@ -44,16 +56,44 @@ int main(int argc, char *argv[]) {
     
     DIR *dir = opendir(opt.path);
     struct dirent *entry;
+
     int i=0;
-    int count = 0; // stores the number of directories/data/entry
     while((entry = readdir(dir)) !=NULL) {
-        data.inode[i] = entry->d_ino;
         data.file_name[i] = strdup(entry->d_name);
         i++;
         data.entry_count++;
     }
 
-    sort_by_filename(&data);
-    show_inode(data, &opt);
+    // sort_by_filename(&data);
+    // show_inode(data, &opt);
 
+
+    i=0;
+    while(i<data.entry_count) {
+        struct stat st;
+        stat(data.file_name[i],&st);
+
+        struct passwd *pw = getpwuid(st.st_uid);
+        struct group  *gr = getgrgid(st.st_gid);
+
+        data.group[i] = strdup(gr->gr_name); 
+        data.user[i] = strdup(pw->pw_name); 
+        data.userID[i] = st.st_uid;
+        data.mod_time[i] = strdup(ctime(&st.st_mtime));
+        
+        // working on permission
+        char perm[11];
+        permission(st.st_mode,perm);
+        data.permission[i] = strdup(perm);
+
+        
+        
+        // printing
+        printf("%s\n",data.permission[i]);
+        // printf("Modified: %s", ctime(&st.st_mtime));
+        // printf("%d\n",data.userID[i]);
+        // printf("%s\n",data.group[i]);
+        i++;
+    }
 }
+
