@@ -1,7 +1,8 @@
 
-#include<dirent.h>
 #include<stdio.h>
+#include<string.h>
 
+#include<dirent.h>
 #include<sys/types.h>
 #include<sys/stat.h> // for stat()
 
@@ -10,7 +11,6 @@
 #include<unistd.h>
 #include<pwd.h>
 #include<grp.h>
-#include<string.h>
 #define MAX_ENTRY 100
 
 typedef struct {
@@ -42,12 +42,6 @@ void permission(mode_t mode, char *perm) {
         perm[0] = '-';
     }
 
-    // if((mode & S_IRUSR)) {
-    //     perm[1] = 'r';
-    // } else {
-    //     perm[1] = '-';
-    // }
-
     perm[1] = (mode & S_IRUSR)?'r':'-';
     perm[2] = (mode & S_IWUSR)?'w':'-';
     perm[3] = (mode & S_IXUSR)?'x':'-';
@@ -61,6 +55,7 @@ void permission(mode_t mode, char *perm) {
     perm[9] = (mode & S_IXOTH)?'x':'-';
     perm[10] = '\0';
 }
+
 
 void scan_directory(Data *data, options opt) {
     
@@ -79,6 +74,7 @@ void scan_directory(Data *data, options opt) {
         struct group  *gr = getgrgid(st.st_gid);
         
         data->file_name[i] = strdup(entry->d_name);
+        data->inode[i] = entry->d_ino;
 
 
         data->group[i] = strdup(gr->gr_name); 
@@ -93,12 +89,6 @@ void scan_directory(Data *data, options opt) {
         char perm[11];
         permission(st.st_mode,perm);
         data->permission[i] = strdup(perm);
-
-        // printing
-        // printf("%s\n",data->permission[i]);
-        // printf("Modified: %s", ctime(&st.st_mtime));
-        // printf("%d\n",data.userID[i]);
-        // printf("%s\n",data.group[i]);
         
         i++;
         data->entry_count++;
@@ -135,7 +125,6 @@ void command_parse(int no_of_arguments, char* command[], options *opt) {
         opt->path = ".";
     }
 }
-
 
 
 void sort_by_filename(Data *data) {
@@ -182,8 +171,6 @@ void sort_by_filename(Data *data) {
         }
     }
 }
-
-
 
 
 void show_inode(const Data data, options opt) {
